@@ -7,7 +7,7 @@ describe("readonly reactive", () => {
 		const observed = reactive(original)
 
 		expect(observed).not.toBe(original)
-		expect(observed.foo).toBe(original)
+		expect(observed.foo).toBe(1)
 		expect(isReactive(observed)).toBe(true)
 		expect(isReactive(original)).toBe(false)
 	})
@@ -20,6 +20,9 @@ describe("readonly reactive", () => {
 			array: [{ bar: 2 }]
 		}
 		const observed = reactive(original)
+		expect(isReactive(observed.nested)).toBe(true)
+		expect(isReactive(observed.array)).toBe(true)
+		expect(isReactive(observed.array[0])).toBe(true)
 	})
 
 
@@ -42,6 +45,9 @@ describe("readonly reactive", () => {
 		const wrapped = readonly(original)
 		expect(wrapped).not.toBe(original)
 		expect(isReadonly(wrapped)).toBe(true)
+		expect(isReadonly(original)).toBe(false)
+		expect(isReadonly(wrapped.bar)).toBe(true)
+		expect(isReadonly(original.bar)).toBe(false)
 		expect(wrapped.foo).toBe(1)
 	})
 
