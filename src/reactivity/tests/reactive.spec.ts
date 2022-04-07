@@ -1,11 +1,24 @@
-import { reactive } from '../reactive';
+import { readonly } from "../reactive";
 
-describe("reactive", () => {
+describe("readonly", () => {
 	it("happy path", () => {
-		const original = { foo: 1 };
-		const observed = reactive(original)
 
-		expect(observed).not.toBe(original)
-		expect(observed.foo).toBe(1)
+		const original = { foo: 1, bar: { baz: 2 } };
+		const wrapped = readonly(original)
+
+		expect(wrapped).not.toBe(original)
+		expect(wrapped.foo).toBe(1)
+	})
+
+
+	it("warn then call set", () => {
+		console.warn = jest.fn()
+
+		const user = readonly({
+			name: "zhangsan"
+		})
+
+		user.name = "lisi"
+		expect(console.warn).toBeCalled()
 	})
 })

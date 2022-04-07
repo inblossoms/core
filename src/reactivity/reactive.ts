@@ -1,21 +1,16 @@
+import { mutableHandlers, readonlyHandlers } from "./baseHandler";
 import { track, trigger } from "./effect";
 
+
+
 export function reactive(raw) {// 模拟 vue 代理
-	return new Proxy(raw, {
-		get(target, key) {
-			// {foo: 1}
-			const res = Reflect.get(target, key);
+	return createActiveObject(raw, mutableHandlers)
+}
 
-			track(target, key) // 进行依赖收集
-			return res;
-		},
+export function readonly(raw) {
+	return createActiveObject(raw, readonlyHandlers)
+}
 
-		set(target, key, value) {
-			const res = Reflect.set(target, key, value);
-
-			// TODO 触发依赖
-			trigger(target, key)
-			return res;
-		}
-	})
+function createActiveObject(raw: any, baseHandlers) {
+	return new Proxy(raw, baseHandlers);
 }
