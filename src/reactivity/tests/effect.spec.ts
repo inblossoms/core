@@ -35,3 +35,11 @@ describe("effect", () => {
 		expect(r).toBe("foo")
 	})
 })
+
+
+/**
+ * 1. 通过 effect 的第二个参数给定一个scheduler的函数
+ * 2. effect 第一次执行时执行run
+ * 3. 当响应式对象通过set进行update更新的时候，不会执行run 而是执行scheduler
+ * 4. 如果说执行 runner 的时候，我们执行的是 scheduler 的函数
+ */

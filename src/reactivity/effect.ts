@@ -1,7 +1,7 @@
 class ReactiveEffect { // 我们搜集的依赖 就是该类（确切的说是有该类包装后的数据）
 	private _fn: any;  // 声明 fn
 
-	constructor(fn) {
+	constructor(fn, public scheduler?) {//scheduler: 是希望在类的外部被访问到的，可选择参数
 		this._fn = fn
 	}
 
@@ -38,9 +38,10 @@ export function track(target, key) { // 我们的track是在reactive中的proxy�
 
 
 let activeEffect
-export function effect(fn) {
-	// fn 需要被一出来就调用 我们可以抽离出一个类来实现
-	const _effect = new ReactiveEffect(fn)
+export function effect(fn, options: any = {}) {
+
+	const scheduler = options.scheduler;//当响应式对象发生第二次修改时，进行一个标记
+	const _effect = new ReactiveEffect(fn, scheduler)// fn 需要被一出来就调用 我们可以抽离出一个类来实现
 
 	// 当我们调用_effect的时候 是希望可以立即执行 fn 的
 	_effect.run()
@@ -55,6 +56,10 @@ export function trigger(target, key) { // 通过target和key 对拿到通过trac
 		, dep = depsMap.get(key);
 
 	for (const effect of dep) {
-		effect.run()
+		if (effect.scheduler) {//当响应式对象有标记 就调用scheduler函数的执行
+			effect.scheduler();
+		} else {
+			effect.run()
+		}
 	}
 }
