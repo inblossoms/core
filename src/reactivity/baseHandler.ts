@@ -1,14 +1,22 @@
 import { track, trigger } from "./effect";
+import { ReactiveFlags } from "./reactive";
 
 const get = createGetter()
 const set = createSetter()
-const readonlyget = createGetter(true)
+const readonlyGet = createGetter(true)
 
 // 公共抽取：提取reactive和readonly的getter 和 setter
 function createGetter(isReadonly = false) {
-	return function (target, key) {
+	return function get(target, key, value) {
+		console.log(key);
+		const res = Reflect.get(target, key, value);
+
+		if (key === ReactiveFlags.IS_REACTIVE) {
+			return !isReadonly;
+		} else if (key === ReactiveFlags.IS_READONLY) {
+			return isReadonly;
+		}
 		// {foo: 1}
-		const res = Reflect.get(target, key);
 		if (!isReadonly) {
 			track(target, key) // 进行依赖收集
 		}
@@ -17,7 +25,7 @@ function createGetter(isReadonly = false) {
 }
 
 function createSetter() {
-	return function (target, key, value) {
+	return function set(target, key, value) {
 		const res = Reflect.set(target, key, value);
 		// TODO 触发依赖
 		trigger(target, key)
@@ -33,10 +41,9 @@ export const mutableHandlers = {
 
 // 抽离 readonly
 export const readonlyHandlers = {
-	readonlyget,
+	get: readonlyGet,
 	set(target, key, value) {
 		console.warn(`key ${key} is The read-only property cannot be modified！`, target);
-
 		return true;
 	}
 }
