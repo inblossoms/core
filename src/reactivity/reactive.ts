@@ -1,4 +1,4 @@
-import { mutableHandlers, readonlyHandlers } from "./baseHandler";
+import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from "./baseHandler";
 import { track, trigger } from "./effect";
 
 export const enum ReactiveFlags {
@@ -9,6 +9,10 @@ export const enum ReactiveFlags {
 
 export function reactive(raw) {// 模拟 vue 代理
 	return createActiveObject(raw, mutableHandlers)
+}
+
+export function shallowReadonly(raw) {
+	return createActiveObject(raw, shallowReadonlyHandlers)
 }
 
 export function readonly(raw) {
