@@ -63,4 +63,22 @@ export function unRef(ref) {
 	return isRef(ref) ? ref.value : ref;
 }
 
+export function proxyRefs(objectWidthRefs) {
+
+	return new Proxy(objectWidthRefs, {
+		get(target, key) {//  getter：如果值是一个 ref 类型就通过 .value 将值返回，反之直接返回
+			return unRef(Reflect.get(target, key))
+		},
+
+		set(target, key, value) {
+			if (isRef(target[key]) && !isRef(value)) {
+				return target[key].value = value
+			} else {
+				return Reflect.set(target, key, value)
+			}
+		}
+	})
+
+}
+
 
