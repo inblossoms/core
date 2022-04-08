@@ -80,7 +80,9 @@ describe("effect", () => {
 		obj.prop = 2
 		expect(dummy).toBe(2)
 		stop(runner)
-		obj.prop = 3;
+		// obj.prop = 3;   // 这种方式 是调用setter
+		obj.prop++
+		// 表达式在执行的时候 会分别指向getter 和 setter ，但是在未做 （stop优化时）会有问题：getter会在每一次执行的时候将第一次的effect清空 导致以自加加的方式获取前不到值
 		expect(dummy).toBe(2)
 
 		runner()
