@@ -27,6 +27,10 @@ export function isReactive(value) {// 需要注意：vlaue 如果没有调用到
 	return !!value[ReactiveFlags.IS_REACTIVE]
 }
 
+export function isProxy(value) {
+	return isReactive(value) || isReadonly(value)
+}
+
 function createActiveObject(raw: any, baseHandlers) {
 	return new Proxy(raw, baseHandlers);
 }

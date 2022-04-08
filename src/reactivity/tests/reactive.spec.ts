@@ -1,4 +1,4 @@
-import { reactive, readonly, isReactive, isReadonly } from "../reactive";
+import { reactive, isReactive, isProxy } from "../reactive";
 
 describe("readonly reactive", () => {
 
@@ -35,31 +35,6 @@ describe("readonly reactive", () => {
 		expect(observed.foo).toBe(1)
 		expect(isReactive(observed)).toBe(true)
 		expect(isReactive(original)).toBe(false)
-	})
-
-
-
-	it("test readonly", () => {
-
-		const original = { foo: 1, bar: { baz: 2 } };
-		const wrapped = readonly(original)
-		expect(wrapped).not.toBe(original)
-		expect(isReadonly(wrapped)).toBe(true)
-		expect(isReadonly(original)).toBe(false)
-		expect(isReadonly(wrapped.bar)).toBe(true)
-		expect(isReadonly(original.bar)).toBe(false)
-		expect(wrapped.foo).toBe(1)
-	})
-
-
-	it("warn then call set", () => {
-		console.warn = jest.fn()
-
-		const user = readonly({
-			name: "zhangsan"
-		})
-
-		user.name = "lisi"
-		expect(console.warn).toBeCalled()
+		expect(isProxy(observed)).toBe(true)
 	})
 })
