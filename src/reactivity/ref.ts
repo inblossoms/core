@@ -13,6 +13,8 @@ class RefImpl {
 	private _value: any
 	public dep;
 	private rawValue: any;
+	public __v_isRef = true;
+
 	constructor(value) {
 		this.rawValue = value
 		// 判断 通过ref传进来的值是否是一个对象  ref内部通过.value调用reactive进行响应式转换
@@ -50,3 +52,15 @@ function convert(value) {
 export function ref(value) {
 	return new RefImpl(value);
 }
+
+
+export function isRef(ref) {
+	return !!ref.__v_isRef; // 当传递进来的是一个原始值 身上就不会有__v_isRef这个key 此时为undefined  需要进行布尔值转换
+}
+
+export function unRef(ref) {
+	// 判断ref 是否为一个ref对象，是返回ref.value  不是就将值返回
+	return isRef(ref) ? ref.value : ref;
+}
+
+
