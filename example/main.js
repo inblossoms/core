@@ -1,0 +1,4 @@
+
+
+
+createApp(App).mount("#app");
