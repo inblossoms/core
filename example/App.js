@@ -7,7 +7,28 @@ export const App = {
 	// <template></template>  内部需要有编译能力
 
 	render() {
-		return h("div", "hi" + this.msg)
+		return h(
+			"div",
+			{
+				id: "root", class: ["red", "hard"]
+			},
+			// "hi" + this.msg
+			// "hi mini-Vue" // string
+			// array
+			[
+				h("p", {
+					class: "red"
+				},
+					"hi"
+				),
+				h("p", {
+					class: "yellow"
+				},
+					"mini - vue"
+				),
+
+			]
+		)
 	},
 
 	setup() {
