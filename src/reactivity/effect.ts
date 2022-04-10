@@ -3,7 +3,7 @@ import { extend } from "../shared";
 let activeEffect
 let shouldTrack
 
-class ReactiveEffect { // 我们搜集的依赖 就是该类（确切的说是有该类包装后的数据）
+export class ReactiveEffect { // 我们搜集的依赖 就是该类（确切的说是有该类包装后的数据）
 	private _fn: any;  // 声明 fn
 	deps = []; // 存储依赖 
 	active = true;
