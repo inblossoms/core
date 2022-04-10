@@ -2,9 +2,11 @@
   "name": "minivue3",
   "version": "1.0.0",
   "description": "实现 Vue3 中的核心三大模块：reactivity 响应式、runtime 运行时、compiler 编译 ，最终的结果是实现一个 mini-vue 这个级别的库",
-  "main": "index.js",
+  "main": "lib/guide-mini-vue.cjs.js",
+	"module": "lib/guide-mini-vue.esm.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "rollup -c rollup.config.js"
   },
   "repository": {
     "type": "git",
@@ -21,9 +23,12 @@
     "@babel/core": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
+    "@rollup/plugin-typescript": "^8.3.1",
     "@types/jest": "^27.4.1",
     "babel-jest": "^27.5.1",
     "jest": "^27.5.1",
+    "rollup": "^2.70.1",
+    "tslib": "^2.3.1",
     "typescript": "^4.6.3"
   }
 }

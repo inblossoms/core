@@ -9,7 +9,11 @@ export function render(vnode, container) {
 
 function patch(vnode, container) {
 
-	// TODO 判断是不是ele 
+	// TODO 判断vnode是不是ele 
+	// 是 ele 那么就应该处理ele 那如何区分 ele 和 compenent
+
+	// processElement();
+
 	processComponent(vnode, container); // 组件的执行程序
 
 } // 处理组件

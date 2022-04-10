@@ -53,9 +53,9 @@ function handleSetupResult(instance, setupRequest: any) {
 
 function finishComponentSetup(instance: any) {
 	const Component = instance.type;
-	if (!Component) {
-		Component.render = instance.render;
-	}// 判断render的存在 将前实例对象上的render函数给过来
+	//if (!Component) {
+	instance.render = Component.render;
+	//	}// 判断render的存在 给当前实例对象上将render函数赋值过来
 
 } //  保证组件的render有值
 
