@@ -7,3 +7,6 @@ export const isObject = (val) => {
 export const hasChanged = (val, newVal) => {
 	return !Object.is(val, newVal)  // 判断值是否发生了改变 为改变范围false
 }
+
+export const hasOwn = (val, key) => Object.prototype.hasOwnProperty.call(val, key)
+

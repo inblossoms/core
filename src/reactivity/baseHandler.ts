@@ -11,7 +11,7 @@ const shallowReadonlyGet = createGetter(true, true)
 // 公共抽取：提取reactive和readonly的getter 和 setter
 function createGetter(isReadonly = false, shallow = false) {
 	return function get(target, key, value) {
-		console.log(key);
+		// console.log(key);
 		const res = Reflect.get(target, key, value);
 
 		if (key === ReactiveFlags.IS_REACTIVE) {
