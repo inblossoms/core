@@ -1,8 +1,11 @@
+import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
+
 export function createComponentInstance(vnode) {
 
 	const component = {
 		vnode,
 		type: vnode.type,
+		setupState: {},
 	}
 
 	return component;
@@ -24,7 +27,23 @@ export function setupComponent(instance) {
 function setupStatefulComponent(instance: any) {
 
 	const Component = instance.type; // 通过实例对象 拿到vnode 的type属性
-
+	// ctx  实现setupState 和 this.$el值的获取
+	instance.proxy = new Proxy({ _: instance },
+		PublicInstanceProxyHandlers
+		// {
+		// 	get(target, key) {
+		// 		const { setupState } = instance
+		// 		if (key in setupState) {// key 就是"hi" + this.msg 这里的msg
+		// 			return setupState[key];
+		// 		}
+		// 		debugger;
+		// 		//  当调用$el时 key 就是$el
+		// 		if (key === "$el") {
+		// 			return instance.vnode.el; // 这种方式需要保证拿到的实例出来的vnode 的el存在
+		// 		}
+		// 	}
+		// }
+	)
 	const { setup } = Component
 
 	if (setup) {

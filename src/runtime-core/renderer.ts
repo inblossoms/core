@@ -9,10 +9,6 @@ export function render(vnode, container) {
 
 
 function patch(vnode, container) {
-
-	// TODO 判断vnode是不是ele 
-	// 是 ele 那么就应该处理ele 那如何区分 ele 和 compenent
-
 	// console.log(vnode.type);
 	if (typeof vnode.type === "string") {
 		processElement(vnode, container);
@@ -28,20 +24,23 @@ function processComponent(vnode: any, container: any) {
 
 
 
-function mountComponent(vnode: any, container) {
-	const instance = createComponentInstance(vnode);
+function mountComponent(initialVNode: any, container) {
+	const instance = createComponentInstance(initialVNode);
 
 	setupComponent(instance);
-	setupRenderEffect(instance, container);
+	setupRenderEffect(instance, initialVNode, container);
 }// 通过虚拟节点创建一个实例对象
 
 
-function setupRenderEffect(instance: any, container) {
-	const subTree = instance.render(); // 拿到虚拟节点树
-
+function setupRenderEffect(instance: any, initialVNode, container) {
+	const { proxy } = instance;
+	const subTree = instance.render.call(proxy); // 拿到虚拟节点树
 	// vnode（vnode 就是 ele 然后对其进行挂载 mountEle） 下一步调用 patch
 
 	patch(subTree, container)
+
+	// ele -> mount 保证所有的ele都处理完成
+	initialVNode.el = subTree.el;
 }
 
 function processElement(vnode: any, container: any) {
@@ -50,7 +49,7 @@ function processElement(vnode: any, container: any) {
 }
 
 function mountElement(vnode: any, container: any) {
-	const el = document.createElement(vnode.type)
+	const el = (vnode.el = document.createElement(vnode.type)) // 将el存起来   vnode是ele类型的 入口文件的div根元素
 
 	// string array
 	const { children } = vnode
