@@ -70,7 +70,15 @@ function mountElement(vnode: any, container: any) {
 	const { props } = vnode
 	for (const key in props) {
 		const val = props[key]
-		el.setAttribute(key, val)
+		// TODO 具体的事件 click -> 通用
+		// on + event name
+		const isOn = (key: string) => /^on[A-Z]/.test(key)
+		if (isOn(key)) {
+			const event = key.slice(2).toLowerCase();
+			el.addEventListener(event, val)
+		} else {
+			el.setAttribute(key, val)
+		}
 	}
 
 	container.append(el);

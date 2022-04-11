@@ -9,7 +9,7 @@ export function createVNode(type, props?, children?) {
 		shapeFlag: getShapeFlag(type),
 		el: null, // 把根节点 el 存起来
 	}
-	debugger
+	// debugger
 	// children
 	if (typeof children === "string") {
 		vonode.shapeFlag |= ShapeFlags.TEXT_CHILDREN

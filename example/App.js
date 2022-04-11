@@ -13,6 +13,12 @@ export const App = {
 			"div",
 			{
 				id: "root", class: ["red", "hard"]
+				, onClick() {
+					console.log("click");
+				},
+				onMousedown() {
+					console.log("onmouserdown");
+				}
 			},
 			/**
 			 *  我们需要通过一个媒介 this 同时获取到setupState 和 this.$el（其实就是返回根节点 get root ele）里的内容
