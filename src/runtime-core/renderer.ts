@@ -66,9 +66,9 @@ function mountElement(vnode: any, container: any) {
 		const val = props[key]
 		el.setAttribute(key, val)
 	}
-	// FIXME append 时 存在错误
+
 	container.append(el);
-	console.log(container);
+	// console.log(container);
 
 }
 
