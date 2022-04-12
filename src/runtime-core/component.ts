@@ -4,6 +4,9 @@ import { initProps } from "./componentProps";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { initSlots } from "./componentSlots";
 
+
+let currentInstance = null
+
 export function createComponentInstance(vnode) {
 
 	const component = {
@@ -41,10 +44,13 @@ function setupStatefulComponent(instance: any) {
 	const { setup } = Component
 
 	if (setup) {
+		setCurrentInstance(instance)// 通过全局变量拿到当前组件的实例对象
+
 		// setup 会返回一个function（name将会是一个render函数）或者 object（返回成一个对象 注入到当前组件的上下文中
 		const setupRequest = setup(shallowReadonly(instance.props), {
 			emit: instance.emit
 		});
+		setCurrentInstance(null) // 执行后清空
 
 		handleSetupResult(instance, setupRequest);
 
@@ -73,3 +79,13 @@ function finishComponentSetup(instance: any) {
 	//	}// 判断render的存在 给当前实例对象上将render函数赋值过来
 
 } //  保证组件的render有值
+
+
+export const getCurrentInstance = (params) => {
+	return currentInstance;
+};
+
+
+export const setCurrentInstance = (instance) => {
+	currentInstance = instance;
+}; // 通过断点 跟踪函数全局变量被谁赋值
