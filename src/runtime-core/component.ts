@@ -23,7 +23,7 @@ export function createComponentInstance(vnode) {
 export function setupComponent(instance) {
 
 	initProps(instance, instance.vnode.props)// 初始化 props
-	initSlots(instance, instance.vnode.children)
+	initSlots(instance, instance.vnode.children) // 添加slots
 
 
 	setupStatefulComponent(instance); // 初始化一个 有状态的组件

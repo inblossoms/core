@@ -2,7 +2,7 @@ import { ShapeFlags } from "../shared/ShapeFlags";
 
 export function createVNode(type, props?, children?) {
 
-	const vonode = {
+	const vnode = {
 		type,
 		props,
 		children,
@@ -12,12 +12,20 @@ export function createVNode(type, props?, children?) {
 	// debugger
 	// children
 	if (typeof children === "string") {
-		vonode.shapeFlag |= ShapeFlags.TEXT_CHILDREN
+		vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN
 	} else if (Array.isArray(children)) {
-		vonode.shapeFlag |= ShapeFlags.ARRRAY_CHILDREN
+		vnode.shapeFlag |= ShapeFlags.ARRRAY_CHILDREN
 	}
 
-	return vonode;
+	// 并不是所有的children都有插槽 在这里进行判断一下
+	// 判断插槽： vnode是一个component组件类型 + children是object
+	if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+		if (typeof children === "object") {
+			vnode.shapeFlag |= ShapeFlags.SLOT_CHILDREN
+		}
+	}
+
+	return vnode;
 
 }
 
