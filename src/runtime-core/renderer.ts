@@ -1,6 +1,7 @@
 import { isObject } from "../shared/index";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
+import { Fragment, Text } from "./vnode";
 
 export function render(vnode, container) {
 
@@ -12,14 +13,28 @@ export function render(vnode, container) {
 function patch(vnode, container) {
 	// ShapeFlags 描述节点类型，标识当前的vnode有哪几种flag
 	// console.log(vnode.type);
-	const { shapeFlag } = vnode
-	if (shapeFlag & ShapeFlags.ELEMENT) {
-		// element
-		processElement(vnode, container);
-	} else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-		// STATEFUL_COMPONENT
-		processComponent(vnode, container); // 组件的执行程序
+	const { type, shapeFlag } = vnode
+
+	// 处理 如果是Fragment的节点，那么就只渲染children
+	switch (type) {
+		case Fragment:
+			processFragment(vnode, container)
+			break;
+		case Text:
+			processText(vnode, container)
+			break;
+
+		default:
+			if (shapeFlag & ShapeFlags.ELEMENT) {
+				// element
+				processElement(vnode, container);
+			} else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+				// STATEFUL_COMPONENT
+				processComponent(vnode, container); // 组件的执行程序
+			}
+			break;
 	}
+
 
 } // 处理组件
 
@@ -91,5 +106,15 @@ function mountChildren(vnode: any, container: any) {
 		patch(v, container)
 	})
 
+}
+
+function processFragment(vnode: any, container: any) {
+	mountChildren(vnode, container)
+}
+
+function processText(vnode: any, container: any) {
+	const { children } = vnode;
+	const textNode = (vnode.el = document.createTextNode(children))
+	container.append(textNode)
 }
 
