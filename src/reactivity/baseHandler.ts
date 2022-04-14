@@ -36,7 +36,6 @@ function createGetter(isReadonly = false, shallow = false) {
 function createSetter() {
 	return function set(target, key, value) {
 		const res = Reflect.set(target, key, value);
-		// TODO 触发依赖
 		trigger(target, key)
 		return res;
 	}

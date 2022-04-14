@@ -7,7 +7,8 @@ import { initSlots } from "./componentSlots";
 
 let currentInstance = null
 
-export function createComponentInstance(vnode) {
+export function createComponentInstance(vnode, parent) {
+	console.log("createComponentInstance", parent);
 
 	const component = {
 		vnode,
@@ -15,6 +16,8 @@ export function createComponentInstance(vnode) {
 		setupState: {},
 		props: {},
 		slots: {},
+		provides: parent ? parent.provides : {},// 根组件没有父级
+		parent,
 		emit: () => { },
 	}
 	component.emit = emit.bind(null, component) as any;
@@ -61,7 +64,6 @@ function setupStatefulComponent(instance: any) {
 
 
 function handleSetupResult(instance, setupRequest: any) {
-	// TODO funciton
 
 	if (typeof setupRequest === "object") { // 将值赋值给当前组件的实例对象上
 		instance.setupState = setupRequest
