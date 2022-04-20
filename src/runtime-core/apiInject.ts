@@ -3,7 +3,7 @@ import { getCurrentInstance } from "./component";
 export const provide = (key, value) => {
 	// 存值
 	// 判断实例存不存在
-	const currentInstance: any = getCurrentInstance()
+	const currentInstance: any = getCurrentInstance(null)
 	if (currentInstance) {
 		let { provides } = currentInstance
 		const parentProvides = currentInstance.parent.provides;
@@ -20,7 +20,7 @@ export const provide = (key, value) => {
 
 export const inject = (key, defaultValue) => {
 	// 取
-	const currentInstance: any = getCurrentInstance()
+	const currentInstance: any = getCurrentInstance(null)
 
 	if (currentInstance) {
 		const parentProvides = currentInstance.parent.provides
