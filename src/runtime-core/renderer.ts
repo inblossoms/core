@@ -1,4 +1,4 @@
-import { isObject } from "../shared/index";
+import { effect } from "../reactivity/effect";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { createAppAPI } from "./createApp";
@@ -11,32 +11,32 @@ export function createRenderer(options) {
 
 	function render(vnode, container) {
 
-		patch(vnode, container, null);
+		patch(null, vnode, container, null);
 
 	} // 目的： 代用一个patch方法 为了后续进行一个递归的处理
 
-
-	function patch(vnode, container, parentComponent) {
+	// prevN -> 旧的虚拟节点  currentN -> 当前的虚拟节点
+	function patch(prevN, currentN, container, parentComponent) {
 		// ShapeFlags 描述节点类型，标识当前的vnode有哪几种flag
 		// console.log(vnode.type);
-		const { type, shapeFlag } = vnode
+		const { type, shapeFlag } = currentN;
 
 		// 处理 如果是Fragment的节点，那么就只渲染children
 		switch (type) {
 			case Fragment:
-				processFragment(vnode, container, parentComponent)
+				processFragment(prevN, currentN, container, parentComponent)
 				break;
 			case Text:
-				processText(vnode, container)
+				processText(prevN, currentN, container)
 				break;
 
 			default:
 				if (shapeFlag & ShapeFlags.ELEMENT) {
 					// element
-					processElement(vnode, container, parentComponent);
+					processElement(prevN, currentN, container, parentComponent);
 				} else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
 					// STATEFUL_COMPONENT
-					processComponent(vnode, container, parentComponent); // 组件的执行程序
+					processComponent(prevN, currentN, container, parentComponent); // 组件的执行程序
 				}
 				break;
 		}
@@ -44,8 +44,8 @@ export function createRenderer(options) {
 
 	} // 处理组件
 
-	function processComponent(vnode: any, container: any, parentComponent) {
-		mountComponent(vnode, container, parentComponent);
+	function processComponent(prevN, currentN: any, container: any, parentComponent) {
+		mountComponent(currentN, container, parentComponent);
 	}
 
 	function mountComponent(initialVNode: any, container, parentComponent) {
@@ -56,24 +56,55 @@ export function createRenderer(options) {
 	}// 通过虚拟节点创建一个实例对象
 
 	function setupRenderEffect(instance: any, initialVNode, container) {
-		const { proxy } = instance;
-		const subTree = instance.render.call(proxy); // 拿到虚拟节点树
-		// vnode（vnode 就是 ele 然后对其进行挂载 mountEle） 下一步调用 patch
+		effect(() => { // 需要进行一个判断：是更新还是初始化  (主要是通过effect 依赖实际和触发依赖进行数据的更新)
+			if (!instance.isMounted) {
+				console.log("init");
 
-		patch(subTree, container, instance)
+				const { proxy } = instance;
+				const subTree = (instance.subTree = instance.render.call(proxy)); // 拿到虚拟节点树
+				// vnode（vnode 就是 ele 然后对其进行挂载 mountEle） 下一步调用 patch
+				// console.log(subTree);
+				patch(null, subTree, container, instance) // 初始化 没有旧的虚拟节点
 
-		// ele -> mount 保证所有的ele都处理完成
-		initialVNode.el = subTree.el;
+				// ele -> mount 保证所有的ele都处理完成
+				initialVNode.el = subTree.el;
+				instance.isMounted = true; // 修改状态
+			} else {
+				console.log("update")
+				// 更新ele 获取到旧的subTree上的节点 和 新值进行对比
+				const { proxy } = instance;
+				const subTree = instance.render.call(proxy);
+				const prevSubTree = instance.subTree;
+				instance.subTree = subTree; // 进行替换 拿到最新的值
+
+				// console.log("current", subTree);
+				// console.log("prev", prevSubTree);
+
+				patch(prevSubTree, subTree, container, instance)
+			}
+
+		})
 	}
 
-	function processElement(vnode: any, container: any, parentComponent) {
+	function processElement(prevN, currentN: any, container: any, parentComponent) {
 		//  ele  类型也会分为 mount初始化 和 update更新
-		mountElement(vnode, container, parentComponent);
+		if (!prevN) {
+			mountElement(currentN, container, parentComponent);
+		} else {
+			patchElement(prevN, currentN, container)
+		}
+	}
+
+	function patchElement(prevN, currentN, container) {
+		console.log("patchElement");
+		console.log("prevN", prevN);
+		console.log("currentN", currentN);
+
 	}
 
 	function mountElement(vnode: any, container: any, parentComponent) {
 		// canvas ： 通过new Element() 创建元素
-		const el = (vnode.el = : hostCreateElement(vnode.type)) // 将el存起来   vnode是ele类型的 入口文件的div根元素
+		const el = (vnode.el = hostCreateElement(vnode.type)) // 将el存起来   vnode是ele类型的 入口文件的div根元素
 
 		// string array
 		const { children, shapeFlag } = vnode
@@ -101,18 +132,18 @@ export function createRenderer(options) {
 
 	function mountChildren(vnode: any, container: any, parentComponent) {
 		vnode.children.forEach((v) => {
-			patch(v, container, parentComponent)
+			patch(null, v, container, parentComponent)
 		})
 
 	}
 
-	function processFragment(vnode: any, container: any, parentComponent) {
-		mountChildren(vnode, container, parentComponent)
+	function processFragment(prevN, currentN: any, container: any, parentComponent) {
+		mountChildren(currentN, container, parentComponent)
 	}
 
-	function processText(vnode: any, container: any) {
-		const { children } = vnode;
-		const textNode = (vnode.el = document.createTextNode(children))
+	function processText(prevN, currentN: any, container: any) {
+		const { children } = currentN;
+		const textNode = (currentN.el = document.createTextNode(children))
 		container.append(textNode)
 	}
 
