@@ -8,7 +8,13 @@ import { Fragment, Text } from "./vnode";
 // 原先是通过具体的方式来实现，现在依赖于新建的渲染接口
 export function createRenderer(options) {
 
-	const { createElement: hostCreateElement, patchProp: hostPatchProp, insert: hostInsert } = options
+	const {
+		createElement: hostCreateElement,
+		patchProp: hostPatchProp,
+		insert: hostInsert,
+		remove: hostRemove,
+		setElementText: hostSetElementText
+	} = options
 
 	function render(vnode, container) {
 
@@ -92,11 +98,11 @@ export function createRenderer(options) {
 		if (!prevN) {
 			mountElement(currentN, container, parentComponent);
 		} else {
-			patchElement(prevN, currentN, container)
+			patchElement(prevN, currentN, container, parentComponent)
 		}
 	}
 
-	function patchElement(prevN, currentN, container) {
+	function patchElement(prevN, currentN, container, parentComponent) {
 		console.log("patchElement");
 		console.log("prevN", prevN);
 		console.log("currentN", currentN);
@@ -106,7 +112,40 @@ export function createRenderer(options) {
 
 		const el = (currentN.el = prevN.el) // 新的节点是没有el
 
+		patchChildren(prevN, currentN, el, parentComponent)
 		patchProps(el, prevProps, currentProps)
+	}
+
+	function patchChildren(prevN, currentN, container, parentComponent) {
+		// 处理子节点内的属性做何种更改
+		// 1. arr -> text
+		const prevShapeFlag = prevN.shapeFlag
+		const { shapeFlag } = currentN
+		const prevChild = prevN.children
+		const newChild = currentN.children // 修改后的节点内容
+
+		if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+			if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+				// 将旧节点中的子节点清空
+				unmountChildren(prevN.children)
+			}
+			if (prevChild !== newChild) {
+				hostSetElementText(container, newChild)
+			}
+		} else {
+			// new array
+			if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+				hostSetElementText(container, "")
+				mountChildren(newChild, container, parentComponent)
+			}
+		}
+	}
+
+	function unmountChildren(children) {
+		for (let i = 0; i < children.length; i++) {
+			const el = children[i].el; // 获取到子节点
+			hostRemove(el);
+		}
 	}
 
 	function patchProps(el, prevProps, currentProps) {
@@ -143,10 +182,10 @@ export function createRenderer(options) {
 		if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
 			// text_children
 			el.textContent = children;
-		} else if (shapeFlag & ShapeFlags.ARRRAY_CHILDREN) {
+		} else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
 			// 如果是array 说明传进来的是vnode 需要调用patch来继续判断ele还是conpontent
 			// array_children
-			mountChildren(vnode, el, parentComponent);
+			mountChildren(vnode.children, el, parentComponent);
 		}
 		// props
 		const { props } = vnode
@@ -162,15 +201,15 @@ export function createRenderer(options) {
 		hostInsert(el, container)
 	}
 
-	function mountChildren(vnode: any, container: any, parentComponent) {
-		vnode.children.forEach((v) => {
+	function mountChildren(children: any, container: any, parentComponent) {
+		children.forEach((v) => {
 			patch(null, v, container, parentComponent)
 		})
 
 	}
 
 	function processFragment(prevN, currentN: any, container: any, parentComponent) {
-		mountChildren(currentN, container, parentComponent)
+		mountChildren(currentN.children, container, parentComponent)
 	}
 
 	function processText(prevN, currentN: any, container: any) {

@@ -17,7 +17,7 @@ export function createVNode(type, props?, children?) {
 	if (typeof children === "string") {
 		vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN
 	} else if (Array.isArray(children)) {
-		vnode.shapeFlag |= ShapeFlags.ARRRAY_CHILDREN
+		vnode.shapeFlag |= ShapeFlags.ARRAY_CHILDREN
 	}
 
 	// 并不是所有的children都有插槽 在这里进行判断一下
