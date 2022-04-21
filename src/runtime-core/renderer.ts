@@ -1,4 +1,5 @@
 import { effect } from "../reactivity/effect";
+import { EMPTY_OBJ } from "../shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { createAppAPI } from "./createApp";
@@ -100,6 +101,36 @@ export function createRenderer(options) {
 		console.log("prevN", prevN);
 		console.log("currentN", currentN);
 
+		const prevProps = prevN.props || EMPTY_OBJ
+		const currentProps = currentN.props || EMPTY_OBJ
+
+		const el = (currentN.el = prevN.el) // 新的节点是没有el
+
+		patchProps(el, prevProps, currentProps)
+	}
+
+	function patchProps(el, prevProps, currentProps) {
+		if (prevProps !== currentProps) {
+			// 1. 遍历查看新旧值是否存在变化
+			for (const key in currentProps) {
+				const prevProp = prevProps[key]
+				const currentProp = currentProps[key]
+
+				if (prevProp !== currentProp) {
+					hostPatchProp(el, key, prevProp, currentProp)
+				}
+			}
+
+			if (currentProps !== EMPTY_OBJ) {
+				// 某属性在新的节点内不存在了  -- 移除掉
+				for (const key in prevProps) {
+					if (!(key in currentProps)) {
+						hostPatchProp(el, key, currentProps[key], null)
+					}
+				}
+			}
+
+		} // 如果并未发生改变 就不需要进行ele的更新
 	}
 
 	function mountElement(vnode: any, container: any, parentComponent) {
@@ -108,6 +139,7 @@ export function createRenderer(options) {
 
 		// string array
 		const { children, shapeFlag } = vnode
+		// children
 		if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
 			// text_children
 			el.textContent = children;
@@ -121,7 +153,7 @@ export function createRenderer(options) {
 		for (const key in props) {
 			const val = props[key]
 
-			hostPatchProp(el, key, val);
+			hostPatchProp(el, key, null, val);
 		}
 
 		// container.append(el); // 在这里将创建并设置好属性后的DOM添加在容器里

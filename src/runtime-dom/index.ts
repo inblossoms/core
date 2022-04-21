@@ -7,15 +7,20 @@ function createElement(type) {
 	return document.createElement(type)
 }
 
-function patchProp(el, key, val) {
+function patchProp(el, key, prevVal, currentVal) {
 	// console.log("patchProp -----------------");
 	// on + event name
 	const isOn = (key: string) => /^on[A-Z]/.test(key)
 	if (isOn(key)) {
 		const event = key.slice(2).toLowerCase();
-		el.addEventListener(event, val)
+		el.addEventListener(event, currentVal)
 	} else {
-		el.setAttribute(key, val)
+		if (currentVal === undefined || currentVal === null) {
+			el.removeAttribute(key)
+			// 处理 值为undefined和null的情况， 移除该属性
+		} else {
+			el.setAttribute(key, currentVal)
+		}
 	}
 
 }

@@ -1,5 +1,7 @@
 export const extend = Object.assign // 做从数据源对象内进行值的抽取
 
+export const EMPTY_OBJ = {}
+
 export const isObject = (val) => {
 	return val !== null && typeof val === "object"
 }
