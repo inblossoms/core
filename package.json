@@ -1,7 +1,7 @@
 {
   "name": "minivue3",
   "version": "1.0.0",
-  "description": "实现 Vue3 中的核心三大模块：reactivity 响应式、runtime 运行时、compiler 编译 ，最终的结果是实现一个 mini-vue 这个级别的库",
+  "description": "vue3 core",
   "main": "lib/guide-mini-vue.cjs.js",
 	"module": "lib/guide-mini-vue.esm.js",
   "scripts": {
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MEIYA-yl/miniVue3.git"
+    "url": "git+https://github.com/inblossoms/core.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MEIYA-yl/miniVue3/issues"
+    "url": "https://github.com/inblossoms/core/issues"
   },
-  "homepage": "https://github.com/MEIYA-yl/miniVue3#readme",
+  "homepage": "https://github.com/inblossom/core#readme",
   "dependencies": {
     "@babel/core": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
